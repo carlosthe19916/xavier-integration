@@ -36,7 +36,7 @@ import javax.persistence.SqlResultSetMapping;
         query = "select provider, product, version, count(distinct host_name) as hosts, count(distinct cluster) as clusters, sum(cpu_cores)*2 as sockets, count(*) as vms \n" +
                 "from workload_inventory_report_model \n" +
                 "where analysis_id = :analysisId \n" +
-                "group by provider, product, version, host_name \n" +
+                "group by provider, product, version \n" +
                 "order by provider, product, version",
         resultSetMapping = "mappingSummaryModels"
 )
