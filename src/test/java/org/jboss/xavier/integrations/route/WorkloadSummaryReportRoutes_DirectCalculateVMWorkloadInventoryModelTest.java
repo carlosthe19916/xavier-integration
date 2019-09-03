@@ -138,8 +138,8 @@ public class WorkloadSummaryReportRoutes_DirectCalculateVMWorkloadInventoryModel
         Assert.assertEquals(3, summaryModelMap.get(2L).getHosts(), 0);
         Assert.assertEquals(3, summaryModelMap.get(1L).getClusters(), 0);
         Assert.assertEquals(3, summaryModelMap.get(2L).getClusters(), 0);
-        Assert.assertEquals(4L, summaryModelMap.get(1L).getSockets(), 0);
-        Assert.assertEquals(10L, summaryModelMap.get(2L).getSockets(), 0);
+        Assert.assertEquals(2L, summaryModelMap.get(1L).getSockets(), 0);
+        Assert.assertEquals(5L, summaryModelMap.get(2L).getSockets(), 0);
         Assert.assertEquals(3, summaryModelMap.get(1L).getVms(), 0);
         Assert.assertEquals(3, summaryModelMap.get(2L).getVms(), 0);
 
