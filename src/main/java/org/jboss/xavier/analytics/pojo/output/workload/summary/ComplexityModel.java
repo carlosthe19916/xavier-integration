@@ -21,7 +21,7 @@ import javax.persistence.*;
 
 @NamedNativeQuery(
         name = "ComplexityModel.calculateComplexityModels",
-        query = "select sum(case when lower(complexity)='easy' then 1 else 0 end) as easy, sum(case when lower(complexity)='medium' then 1 else 0 end) as medium, sum(case when lower(complexity)='hard' then 1 else 0 end) as hard, sum(case when (complexity is null or lower(complexity)='unknown') then 1 else 0 end) as \"unknown\" from workload_inventory_report_model where analysis_id = :analysisId",
+        query = "select coalesce(sum(case when lower(complexity)='easy' then 1 else 0 end), 0) as easy, coalesce(sum(case when lower(complexity)='medium' then 1 else 0 end), 0) as medium, coalesce(sum(case when lower(complexity)='hard' then 1 else 0 end), 0) as hard, coalesce(sum(case when (complexity is null or lower(complexity)='unknown') then 1 else 0 end), 0) as \"unknown\" from workload_inventory_report_model where analysis_id = :analysisId",
         resultSetMapping = "mappingComplexityModels"
 )
 
