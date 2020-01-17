@@ -125,7 +125,8 @@ public class MainRouteBuilder extends RouteBuilderExceptionHandler {
                 .routeId("kafka-upload-message")
                 .unmarshal().json(JsonLibrary.Jackson, FilePersistedNotification.class)
                 .filter(simple("'{{insights.service}}' == ${body.getService}"))
-                .log("Payload ID received ${body.getPayload_id}")
+                .log("Body ${body}")
+                .log("Payload ID received ${body.getPayload_id} ${body.payload_id}")
                 .process(exchange -> {
                     throw new IllegalStateException("Intentional Exception");
                 })
