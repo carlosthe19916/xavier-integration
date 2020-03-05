@@ -1300,6 +1300,233 @@
             }
         },
         {
+            "kind": "DeploymentConfig",
+            "apiVersion": "apps.openshift.io/v1",
+            "metadata": {
+                "name": "analytics-integration-analyzer",
+                "generation": 63,
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "analytics-integration-analyzer",
+                    "application": "migration-analytics",
+                    "component": "analytics-integration",
+                    "provider": "s2i",
+                    "template": "analytics-integration",
+                    "version": "1.0.0.fuse-730046-redhat-00002"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate",
+                    "recreateParams": {
+                        "timeoutSeconds": 600
+                    },
+                    "resources": {},
+                    "activeDeadlineSeconds": 21600
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "analytics-integration"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "analytics-integration:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "revisionHistoryLimit": 10,
+                "test": false,
+                "selector": {
+                    "app": "analytics-integration-analyzer",
+                    "component": "analytics-integration",
+                    "deploymentconfig": "analytics-integration-analyzer",
+                    "provider": "s2i",
+                    "version": "1.0.0.fuse-730046-redhat-00002"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "analytics-integration-analyzer",
+                            "component": "analytics-integration",
+                            "deploymentconfig": "analytics-integration-analyzer",
+                            "provider": "s2i",
+                            "version": "1.0.0.fuse-730046-redhat-00002"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "analytics-integration",
+                                "image": "library/analytics-integration:latest",
+                                "ports": [
+                                    {
+                                        "name": "jolokia",
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "rest",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "KUBERNETES_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "KIESERVER_SERVICE",
+                                        "value": "analytics-kieserver"
+                                    },
+                                    {
+                                        "name": "KIESERVER_USERNAME",
+                                        "value": "executionUser"
+                                    },
+                                    {
+                                        "name": "KIESERVER_PASSWORD",
+                                        "value": "rksxsp2!"
+                                    },
+                                    {
+                                        "name": "KIESERVER_PATH",
+                                        "value": "services/rest/server/containers/instances/${kieserver.container}"
+                                    },
+                                    {
+                                        "name": "KIESERVER_CONTAINER",
+                                        "value": "xavier-analytics_0.0.1-SNAPSHOT"
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "name": "${DATABASE_SERVICE_NAME}",
+                                                "key": "database-user"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "name": "${DATABASE_SERVICE_NAME}",
+                                                "key": "database-password"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_DATABASE",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "name": "${DATABASE_SERVICE_NAME}",
+                                                "key": "database-name"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "AMQ_SERVER",
+                                        "value": "broker-amq-tcp"
+                                    },
+                                    {
+                                        "name": "INSIGHTS_KAFKA_HOST",
+                                        "value": "${INSIGHTS_KAFKA_HOST}"
+                                    },
+                                    {
+                                        "name": "INSIGHTS_UPLOAD_HOST",
+                                        "value": "${INSIGHTS_UPLOAD_HOST}"
+                                    },
+                                    {
+                                        "name": "INSIGHTS_UPLOAD_MIMETYPE",
+                                        "value": "${INSIGHTS_UPLOAD_MIMETYPE}"
+                                    },
+                                    {
+                                        "name": "INSIGHTS_KAFKA_VALIDATION_TOPIC",
+                                        "value": "${INSIGHTS_KAFKA_VALIDATION_TOPIC}"
+                                    },
+                                    {
+                                        "name": "INSIGHTS_KAFKA_UPLOAD_TOPIC",
+                                        "value": "${INSIGHTS_KAFKA_UPLOAD_TOPIC}"
+                                    },
+                                    {
+                                        "name": "IS_ANALYZER",
+                                        "value": "true"
+                                    },
+                                    {
+                                        "name": "SPRING_JPA_HIBERNATE_DLL-AUTO",
+                                        "value": "validate"
+                                    }
+                                ],
+                                "resources": {
+                                    "limits": {
+                                        "cpu": "1",
+                                        "memory": "2Gi"
+                                    },
+                                    "requests": {
+                                        "cpu": "400m",
+                                        "memory": "2Gi"
+                                    }
+                                },
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8081,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 180,
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8081,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 10,
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {},
+                        "schedulerName": "default-scheduler"
+                    }
+                }
+            },
+            "status": {
+                "latestVersion": 0,
+                "observedGeneration": 0,
+                "replicas": 0,
+                "updatedReplicas": 0,
+                "availableReplicas": 0,
+                "unavailableReplicas": 0
+            }
+        },
+        {
             "kind": "Route",
             "apiVersion": "route.openshift.io/v1",
             "metadata": {
@@ -1678,6 +1905,39 @@
                 ],
                 "selector": {
                     "deploymentconfig": "analytics-integration"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "xavier-analyzer",
+                "labels": {
+                    "app": "xavier-analyzer-http",
+                    "application": "migration-analytics",
+                    "service": "xavier-analyzer"
+                },
+                "annotations": {
+                    "description": "The web server's http port."
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "http",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentconfig": "analytics-integration-analyzer"
                 },
                 "type": "ClusterIP",
                 "sessionAffinity": "None"
