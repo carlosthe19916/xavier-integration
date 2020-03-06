@@ -242,7 +242,8 @@ public class EndToEndTest {
                         "kieserver.devel-service=" + getHostForKie() + "/kie-server",
                         "spring.datasource.url = jdbc:postgresql://" + getContainerHost(postgreSQL) + "/sampledb" ,
                         "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQL9Dialect" ,
-                        "thread.concurrentConsumers=3");
+                        "thread.concurrentConsumers=3",
+                        "IS_ANALYZER=true");
             } catch (Exception e) {
                 e.printStackTrace();
             }
