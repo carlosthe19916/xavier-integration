@@ -26,6 +26,8 @@
         <!--this is used by logback-test.xml-->
         <testLogRootLevel>info</testLogRootLevel>
         <testcontainers.version>1.12.4</testcontainers.version>
+        
+<!--         comment for testing -->
     </properties>
 
     <dependencyManagement>
