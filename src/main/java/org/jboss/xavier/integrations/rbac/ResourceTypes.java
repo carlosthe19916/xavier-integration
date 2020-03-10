@@ -23,6 +23,7 @@ public class ResourceTypes {
     public static final Map<String, List<String>> RESOURCE_TYPES = new HashMap<>();
 
     static {
+        RESOURCE_TYPES.put("api", Collections.singletonList("read"));
         RESOURCE_TYPES.put("user", Collections.singletonList("read"));
     }
 

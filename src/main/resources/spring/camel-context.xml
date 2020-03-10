@@ -52,6 +52,11 @@
         <interceptFrom id="interceptor-username" uri="rest:*">
             <to uri="direct:check-authenticated-request" />
             <to uri="direct:fetch-and-process-rbac-user-access" />
+            <!-- RBAC check start: check min user permissions-->
+            <setHeader headerName="${type:org.jboss.xavier.integrations.rbac.RBACRouteBuilder.RBAC_ENDPOINT_RESOURCE_NAME}"><constant>api</constant></setHeader>
+            <setHeader headerName="${type:org.jboss.xavier.integrations.rbac.RBACRouteBuilder.RBAC_ENDPOINT_RESOURCE_PERMISSION}"><constant>read</constant></setHeader>
+            <to uri="direct:check-rbac-permissions" />
+            <!-- RBAC check end-->
             <when>
                 <simple>${header.CamelServletContextPath} contains '/administration/'</simple>
                 <to uri="direct:check-authorized-request" />
