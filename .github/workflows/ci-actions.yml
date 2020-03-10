@@ -1,0 +1,80 @@
+name: Xavier Integration CI
+
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+    paths-ignore:
+      - 'README.md'
+      - '.dependabot/**'
+  pull_request:
+    types: [assigned, opened, synchronize, reopened, ready_for_review, edited]
+    paths-ignore:
+      - 'README.md'
+env:
+  JVM_TEST_MAVEN_OPTS: "-e -B -P !fuse-fabric8-docker --settings configuration/settings.xml"
+
+jobs:
+  linux-jvm-tests:
+    name: JDK 8 JVM Tests
+    timeout-minutes: 120
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        # Uses sha for added security since tags can be updated
+        uses: joschi/setup-jdk@7134ae95986e4e0a4f9f0b51345c93fcebfc4ea9
+        with:
+          java-version: openjdk8
+      - name: Build with Maven
+        if: github.event_name == 'pull_request'
+        run: eval mvn $JVM_TEST_MAVEN_OPTS verify -P coverage
+      - name: Build with Maven
+        if: github.event_name != 'pull_request'
+        run: eval mvn $JVM_TEST_MAVEN_OPTS verify -P coverage,sonar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Codecov metrics
+        uses: codecov/codecov-action@v1
+      - name: Prepare failure archive (if maven failed)
+        if: failure()
+        shell: bash
+        run: find . -name '*-reports' -type d | tar -czvf test-reports.tgz -T -
+      - name: Upload failure Archive (if maven failed)
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: test-reports-linux-jvm8
+          path: 'test-reports.tgz'
+
+  linux-jdk8-jvm-end2end-tests:
+    name: JDK 8 JVM ${{matrix.class-name}} Test
+    timeout-minutes: 120
+    strategy:
+      fail-fast: ${{ github.repository == 'project-xavier/xavier-integration' }}
+      matrix:
+        class-name: [Case1EndToEndIT,Case2EndToEndIT]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        # Uses sha for added security since tags can be updated
+        uses: joschi/setup-jdk@7134ae95986e4e0a4f9f0b51345c93fcebfc4ea9
+        with:
+          java-version: openjdk8
+      - name: Build with Maven
+        run: eval mvn $JVM_TEST_MAVEN_OPTS -P endToEnd -Dtest=${{ matrix.class-name }} test
+      - name: Prepare failure archive (if maven failed)
+        if: failure()
+        shell: bash
+        run: find . -name '*-reports' -type d | tar -czvf test-reports.tgz -T -
+      - name: Upload failure Archive (if maven failed)
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: test-reports-linux-jvm-${{matrix.class-name}}
+          path: 'test-reports.tgz'
