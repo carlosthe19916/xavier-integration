@@ -7,7 +7,8 @@ import java.util.Objects;
  */
 public class UserPermission
 {
-    public static final UserPermission WILDCARD = new UserPermission("*", "*");
+    private static final String WILDCARD = "*";
+    public static final UserPermission WILDCARD_PERMISSION = new UserPermission(WILDCARD, WILDCARD);
     private final String resource;
     private final String action;
     // then add here (in the future) the list of attribute filters: EqualFilter, InFilter and so on
@@ -30,6 +31,38 @@ public class UserPermission
         {
             return new UserPermission(permissionComponents[1], permissionComponents[2]);
         }
+    }
+
+    public static UserPermission buildWildcardResource(String action)
+    {
+        Objects.requireNonNull(action, "Null action definition");
+        return new UserPermission(WILDCARD, action);
+    }
+
+    public static UserPermission buildWildcardAction(String resource)
+    {
+        Objects.requireNonNull(resource, "Null resource definition");
+        return new UserPermission(resource, WILDCARD);
+    }
+
+/*
+    Option 1
+    public String getResource()
+    {
+        return resource;
+    }
+
+    public String getAction()
+    {
+        return action;
+    }
+*/
+
+    public boolean equalsWildcardPermissions(UserPermission userPermission)
+    {
+        return userPermission.equals(UserPermission.WILDCARD_PERMISSION) ||
+                userPermission.equals(UserPermission.buildWildcardAction(userPermission.resource)) ||
+                userPermission.equals(UserPermission.buildWildcardResource(userPermission.action));
     }
 
     @Override

@@ -33,7 +33,16 @@ public class RBACRouteBuilder extends RouteBuilder {
     private String rbacApplicationName;
 
     private final BiPredicate<UserPermission, UserPermission> isRequestAllowed = (userPermission, requiredPermission) ->
-            userPermission.equals(UserPermission.WILDCARD) ||
+/*
+            Option 1
+            userPermission.equals(UserPermission.WILDCARD_PERMISSION) ||
+            userPermission.equals(UserPermission.buildWildcardAction(requiredPermission.getResource())) ||
+            userPermission.equals(UserPermission.buildWildcardResource(requiredPermission.getAction())) ||
+*/
+/*
+            Option 2
+ */
+            userPermission.equalsWildcardPermissions(requiredPermission) ||
             userPermission.equals(requiredPermission);
 
     public void configure() throws Exception {
@@ -47,7 +56,7 @@ public class RBACRouteBuilder extends RouteBuilder {
 
                 .choice()
                     .when(exchange -> exchange.getIn().getHeader(RouteBuilderExceptionHandler.X_RH_IDENTITY_IS_ORG_ADMIN, Boolean.class))
-                        .setHeader(RBAC_USER_PERMISSIONS, constant(Collections.singletonList(UserPermission.WILDCARD)))
+                        .setHeader(RBAC_USER_PERMISSIONS, constant(Collections.singletonList(UserPermission.WILDCARD_PERMISSION)))
                     .endChoice()
                     .otherwise()
                         .enrich("direct:fetch-rbac-user-access", (oldExchange, newExchange) -> {
