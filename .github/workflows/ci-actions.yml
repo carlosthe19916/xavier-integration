@@ -1,0 +1,53 @@
+name: Xavier Integration CI
+
+on:
+  # Will execute the jobs when a push even (new commit) appears in the repository. This includes all branches including 'master' branch.
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+    paths-ignore:
+      - 'README.md'
+      - '.dependabot/**'
+  # Will execute the jobs when a new Pull Request is registered in the repository
+  pull_request:
+    types: [assigned, opened, synchronize, reopened, ready_for_review, edited]
+    paths-ignore:
+      - 'README.md'
+  # Will execute the jobs daily at 00:00:00
+  schedule:
+    - cron:  '0 0 * * *'
+
+# Declare ENV variables that will be available in every Job
+env:
+  JVM_TEST_MAVEN_OPTS: "-e -B -P !fuse-fabric8-docker --settings configuration/settings.xml"
+
+# Jobs are executed in parallel unless we use 'needs' field to describe dependencies between jobs
+jobs:
+
+  # Execute all unit tests
+  linux-jvm-tests:
+    name: JDK 8 JVM Tests
+    timeout-minutes: 120
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v2
+      - name: Set up JDK 8
+        # Uses sha for added security since tags can be updated
+        uses: joschi/setup-jdk@7134ae95986e4e0a4f9f0b51345c93fcebfc4ea9
+        with:
+          java-version: openjdk8
+      - name: Build with Maven
+        run: eval mvn $JVM_TEST_MAVEN_OPTS verify -P coverage
+      - name: Prepare failure archive (if maven failed)
+        if: failure()
+        shell: bash
+        run: find . -name '*-reports' -type d | tar -czvf test-reports.tgz -T -
+      - name: Upload failure Archive (if maven failed)
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: test-reports
+          path: 'test-reports.tgz'
