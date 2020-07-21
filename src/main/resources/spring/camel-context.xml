@@ -533,7 +533,7 @@
         </route>
 
         <route id="route-ma">
-            <from uri="seda:uploadFormInputDataModel?concurrentConsumers={{thread.concurrentConsumers:5}}"/>
+            <from uri="direct:uploadFormInputDataModel"/>
                 <log message="Message received" />
                 <to uri="log:INFO?showBody=true&amp;showHeaders=true" />
                 <setHeader headerName="${type:org.jboss.xavier.integrations.route.RouteBuilderExceptionHandler.ANALYSIS_ID}">

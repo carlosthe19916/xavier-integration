@@ -280,7 +280,7 @@ public class MainRouteBuilder extends RouteBuilderExceptionHandler {
 
         from("direct:send-costsavings").routeId("send-costsavings")
                 .setBody(header(UPLOADFORMDATA))
-                .to("seda:uploadFormInputDataModel")
+                .to("direct:uploadFormInputDataModel")
                 .end();
 
         from("direct:calculate-costsavings").routeId("calculate-costsavings")
