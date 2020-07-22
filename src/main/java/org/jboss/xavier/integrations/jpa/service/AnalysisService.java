@@ -67,6 +67,14 @@ public class AnalysisService
         analysisRepository.save(analysisModel);
     }
 
+    public void SleepThread() {
+        try {
+            Thread.sleep(180000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addWorkloadInventoryReportModels(List<WorkloadInventoryReportModel> reportModels, Long id) {
         AnalysisModel analysisModel = findById(id);
         analysisModel.setWorkloadInventoryReportModels(reportModels);

@@ -535,6 +535,7 @@
         <route id="route-ma">
             <from uri="seda:uploadFormInputDataModel?concurrentConsumers={{thread.concurrentConsumers:5}}"/>
                 <log message="Message received" />
+                <bean ref="analysisService" method="SleepThread()" />
                 <to uri="log:INFO?showBody=true&amp;showHeaders=true" />
                 <setHeader headerName="${type:org.jboss.xavier.integrations.route.RouteBuilderExceptionHandler.ANALYSIS_ID}">
                     <simple>${body.${type:org.jboss.xavier.integrations.route.RouteBuilderExceptionHandler.ANALYSIS_ID}}</simple>
