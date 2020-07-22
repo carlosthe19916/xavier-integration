@@ -69,10 +69,11 @@ public class AnalysisService
 
     public void SleepThread() {
         try {
-            Thread.sleep(180000);
+            Thread.sleep(120000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        throw new IllegalStateException("My own exception to force failure");
     }
 
     public void addWorkloadInventoryReportModels(List<WorkloadInventoryReportModel> reportModels, Long id) {
